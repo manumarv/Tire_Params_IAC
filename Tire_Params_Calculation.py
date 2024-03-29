@@ -1,6 +1,6 @@
 from TIR_Parser import parse_tir_file
 
-
+import math 
 #Longitudinal Force 
 
 file_path = '/home/mar/Tire_Params_IAC/Tir Files/2021021_Firestone_IAC_LF_B4112T_MF62_UM4 - extended.tir'
@@ -33,23 +33,21 @@ b12 =    float(extracted_parameters['LONGITUDINAL_COEFFICIENTS'].get('RHX1'))# V
 b13 =    float(extracted_parameters['LONGITUDINAL_COEFFICIENTS'].get('RBX3 '))# Curvature shift	
 
 
-# C   =   b0   #Shape Factor
-# D   =   Fz*(b1*Fz+b2) # Peak Factor
-# BCD =   (b3*Fz**2+b4*Fz)*exp(-b5*Fz)   
-# B   =   BCD/(C*D)
-# E   =   (b6*Fz**2+b7*Fz+b8)*(1-b13*sign(slip+H))
-# H   =   b9*Fz+b10
-# V   =   b11*Fz+b12
+Fz  =  float(extracted_parameters['VERTICAL'].get('FNOMIN'))
+
+slip = 0.5 # slip ratio which can be a range from 0 to 1
+
+C   =   b0   #Shape Factor
+D   =   Fz*(b1*Fz+b2) # Peak Factor
+
+BCD =   (b3*Fz**2+b4*Fz)*math.exp(-b5*Fz)  
+
+B   =   BCD/(C*D)
+H   =   b9*Fz+b10
+E   =   (b6*Fz**2+b7*Fz+b8)*(1-b13*math.sign(slip+H))
+V   =   b11*Fz+b12
 
 
-# Fx   =   D * sin(C*atan(B-E(B-atan(B))))+V
+Fx   =   D * math.sin(C*math.atan(B-E(B-math.atan(B))))+V
 
 
-# if 'OPERATING_CONDITIONS' in extracted_parameters:
-#     operating_conditions = extracted_parameters['LONGITUDINAL_COEFFICIENTS']
-#     inflpres = operating_conditions.get('PCX1')  # Example parameter extraction
-
-#     # Do something with the extracted parameter value
-#     print("Inflation Pressure:", inflpres)
-# else:
-#     print("OPERATING_CONDITIONS section not found in the .tir file.")
